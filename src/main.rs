@@ -3,6 +3,7 @@ use std::net::{TcpListener, TcpStream};
 
 mod statics;
 mod thread;
+use thread::ThreadPool;
 
 fn main() {
     let bind = statics::PORT; // TODO: make port decider
