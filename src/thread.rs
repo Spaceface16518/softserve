@@ -1,9 +1,9 @@
 use std::sync::{mpsc, Arc, Mutex};
-use std::thread;
+use std::thread as std_thread;
 
 pub struct ThreadPool {
     threads: Vec<Worker>,
-    sender: mpsc::Sender<Job>,
+    sender: mpsc::Sender<Message>,
 }
 
 impl ThreadPool {
@@ -36,31 +36,37 @@ impl ThreadPool {
 
 impl Drop for ThreadPool {
     fn drop(&mut self) {
+        println!("Instructing all workers to terminate...");
+        for _ in 0..self.threads.len() {
+            self.sender.send(Message::Terminate).unwrap()
+        }
         for worker in &mut self.threads {
             println!("Shutting down worker {}", worker.id);
 
-            worker.thread.unwrap().join().unwrap();
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
         }
     }
 }
 
 struct Worker {
     id: usize,
-    thread: Option<thread::JoinHandle<()>>,
+    thread: Option<std_thread::JoinHandle<()>>,
 }
 
 impl Worker {
-    pub fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
-        let thread = thread::spawn(move || loop {
+    pub fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Message>>>) -> Worker {
+        let thread = std_thread::spawn(move || loop {
             let message = receiver.lock().unwrap().recv().unwrap();
             match message {
                 Message::NewJob(job) => {
-                    println!("Worker {} got a job. Executing...", id);
+                    println!("[Worker {}] Got a job. Executing...", id);
                     job.call_box();
                 }
                 Message::Terminate => {
                     println!(
-                        "Worker {} was instructed to terminate. Breaking loop...",
+                        "[Worker {}] Instructed to terminate. Breaking loop...",
                         id
                     );
                     break; // Breaks out of the loop to prevent endless blocking on thread join
@@ -83,11 +89,11 @@ enum Message {
 
 // BUG: in `dyn XYZ` syntax, `XYZ` is a trait, not a type; can't call it using `Self` or type parameter `F`
 trait FnBox {
-    fn call_box(self: Box<dyn Self>);
+    fn call_box(self: Box<Self>);
 }
 
 impl<F: FnOnce()> FnBox for F {
-    fn call_box(self: Box<dyn F>) {
+    fn call_box(self: Box<F>) {
         (*self)()
     }
 }
