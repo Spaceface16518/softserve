@@ -1,6 +1,6 @@
+use std::fs::read_to_string;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
-use std::fs::read_to_string;
 
 mod statics;
 mod thread;
@@ -41,6 +41,10 @@ fn handle(mut stream: TcpStream) {
 
 enum BufCheck {
     File(String),
-    Def,
-    Error404,
+    Def(Defs),
+}
+
+enum Defs {
+    Reply,
+    Error,
 }

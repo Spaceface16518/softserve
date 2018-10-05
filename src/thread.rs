@@ -65,10 +65,7 @@ impl Worker {
                     job.call_box();
                 }
                 Message::Terminate => {
-                    println!(
-                        "[Worker {}] Instructed to terminate. Breaking loop...",
-                        id
-                    );
+                    println!("[Worker {}] Instructed to terminate. Breaking loop...", id);
                     break; // Breaks out of the loop to prevent endless blocking on thread join
                 }
             }
