@@ -2,7 +2,7 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::thread as std_thread;
 
 pub struct ThreadPool {
-    threads: Vec<Worker>,
+    workers: Vec<Worker>,
     sender: mpsc::Sender<Message>,
 }
 
@@ -13,13 +13,13 @@ impl ThreadPool {
         let (sender, receiver) = mpsc::channel();
         let receiver = Arc::new(Mutex::new(receiver));
 
-        let mut threads = Vec::with_capacity(size);
+        let mut workers = Vec::with_capacity(size);
 
         for id in 0..size {
-            threads.push(Worker::new(id, Arc::clone(&receiver)));
+            workers.push(Worker::new(id, Arc::clone(&receiver)));
         }
 
-        ThreadPool { threads, sender }
+        ThreadPool { workers, sender }
     }
 
     pub fn execute<F>(&self, f: F)
@@ -37,10 +37,10 @@ impl ThreadPool {
 impl Drop for ThreadPool {
     fn drop(&mut self) {
         println!("Instructing all workers to terminate...");
-        for _ in 0..self.threads.len() {
+        for _ in 0..self.workers.len() {
             self.sender.send(Message::Terminate).unwrap()
         }
-        for worker in &mut self.threads {
+        for worker in &mut self.workers {
             println!("Shutting down worker {}", worker.id);
 
             if let Some(thread) = worker.thread.take() {
