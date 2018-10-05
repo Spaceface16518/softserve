@@ -1,5 +1,4 @@
 use std::io::prelude::*;
-use std::path::Path;
 use std::net::{TcpListener, TcpStream};
 use std::fs::read_to_string;
 
