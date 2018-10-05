@@ -84,7 +84,6 @@ enum Message {
     Terminate,
 }
 
-// BUG: in `dyn XYZ` syntax, `XYZ` is a trait, not a type; can't call it using `Self` or type parameter `F`
 trait FnBox {
     fn call_box(self: Box<Self>);
 }
