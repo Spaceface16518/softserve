@@ -30,3 +30,43 @@ macro_rules! app {
     };
 }
 
+type param_inner = &str;
+
+pub struct AppParams {
+    name: param_inner,
+    version: param_inner,
+    author: param_inner,
+    description: param_inner,
+}
+
+impl AppParams {
+    pub fn new(
+        name: param_inner,
+        version: param_inner,
+        author: param_inner,
+        description: param_inner,
+    ) -> AppParams {
+        AppParams {
+            name,
+            version,
+            author,
+            description,
+        }
+    }
+
+    pub fn name(&self) -> param_inner {
+        self.name
+    }
+
+    pub fn version(&self) -> param_inner {
+        self.version
+    }
+
+    pub fn author(&self) -> param_inner {
+        self.author
+    }
+
+    pub fn description(&self) -> param_inner {
+        self.description
+    }
+}
