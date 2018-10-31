@@ -1,3 +1,5 @@
+extern crate alloc_system;
+
 use std::fs::read_to_string;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
@@ -38,14 +40,4 @@ fn handle(mut stream: TcpStream) {
 
     stream.write(response.as_bytes()).unwrap();
     stream.flush().unwrap();
-}
-
-enum BufCheck {
-    File(String),
-    Def(Defs),
-}
-
-enum Defs {
-    Reply,
-    Error,
 }
