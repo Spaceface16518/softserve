@@ -2,6 +2,7 @@ extern crate clap;
 
 use self::clap::{App, Arg};
 
+#[inline]
 pub fn app<'a, 'b>(
     name: &'b str,
     version: &'b str,
