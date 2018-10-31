@@ -1,6 +1,8 @@
 extern crate clap;
 
 use self::clap::{App, Arg};
+use std::net::SocketAddrV4;
+use std::path::Path;
 
 #[inline]
 pub fn app<'a, 'b>(
@@ -31,4 +33,15 @@ pub fn app<'a, 'b>(
                 .required(true)
                 .help("Sets the path of the public asset folder"),
         )
+}
+
+pub struct Config<'a> {
+    addr: &'a SocketAddrV4,
+    path: &'a Path,
+}
+
+impl<'a> Config<'a> {
+    pub fn new(addr: &'a SocketAddrV4, path: &'a Path) -> Config<'a> {
+        Config { addr, path }
+    }
 }
