@@ -1,5 +1,3 @@
-extern crate alloc_system;
-
 use std::fs::read_to_string;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
