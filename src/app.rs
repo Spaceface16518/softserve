@@ -1,6 +1,6 @@
 extern crate clap;
 
-use clap::{App, Arg};
+use self::clap::{App, Arg};
 
 #[macro_export]
 macro_rules! app {
@@ -30,22 +30,22 @@ macro_rules! app {
     };
 }
 
-type param_inner = &str;
+type param_inner<'a> = &'a str;
 
-pub struct AppParams {
-    name: param_inner,
-    version: param_inner,
-    author: param_inner,
-    description: param_inner,
+pub struct AppParams<'a> {
+    name: param_inner<'a>,
+    version: param_inner<'a>,
+    author: param_inner<'a>,
+    description: param_inner<'a>,
 }
 
-impl AppParams {
+impl<'a> AppParams<'a> {
     pub fn new(
-        name: param_inner,
-        version: param_inner,
-        author: param_inner,
-        description: param_inner,
-    ) -> AppParams {
+        name: param_inner<'a>,
+        version: param_inner<'a>,
+        author: param_inner<'a>,
+        description: param_inner<'a>,
+    ) -> AppParams<'a> {
         AppParams {
             name,
             version,
