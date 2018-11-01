@@ -1,6 +1,6 @@
 extern crate clap;
 
-use self::clap::{App, Arg};
+use self::clap::{App, Arg, ArgMatches};
 use std::net::SocketAddrV4;
 use std::path::Path;
 
@@ -35,13 +35,22 @@ pub fn app<'a, 'b>(
         )
 }
 
-pub struct Config<'a> {
-    addr: &'a SocketAddrV4,
-    path: &'a Path,
+pub fn handle_matches(matches: ArgMatches) -> Config {
+    let addr: SocketAddrV4 = matches.value_of("port").unwrap().parse().unwrap();
+    let path: String = matches.value_of("path").unwrap().to_string();
+    Config {
+        addr: addr.clone(),
+        path: path.clone(),
+    }
 }
 
-impl<'a> Config<'a> {
-    pub fn new(addr: &'a SocketAddrV4, path: &'a Path) -> Config<'a> {
+pub struct Config {
+    addr: SocketAddrV4,
+    path: String,
+}
+
+impl Config {
+    pub fn new(addr: SocketAddrV4, path: String) -> Config {
         Config { addr, path }
     }
 }
