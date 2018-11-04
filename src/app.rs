@@ -2,6 +2,7 @@ extern crate clap;
 
 use self::clap::{App, Arg, ArgMatches};
 use std::net::SocketAddrV4;
+use std::path::Path;
 
 #[inline]
 pub fn app<'a, 'b>(
@@ -32,24 +33,14 @@ pub fn app<'a, 'b>(
                 .required(true)
                 .help("Sets the path of the public asset folder"),
         )
-}
-
-pub fn handle_matches(matches: ArgMatches) -> Config {
-    let addr: SocketAddrV4 = matches.value_of("port").unwrap().parse().unwrap();
-    let path: String = matches.value_of("path").unwrap().to_string();
-    Config {
-        addr: addr.clone(),
-        path: path.clone(),
-    }
-}
-
-pub struct Config {
-    addr: SocketAddrV4,
-    path: String,
-}
-
-impl Config {
-    pub fn new(addr: SocketAddrV4, path: String) -> Config {
-        Config { addr, path }
-    }
+        // MARK: max threads option
+        .arg(
+            Arg::with_name("max")
+            .short("m")
+            .long("maxt")
+            .takes_value(true)
+            .required(false)
+            .help("Sets the maximum additional threads this server is allowed to spawn. The default is 4")
+            .default_value("4")
+        )
 }
