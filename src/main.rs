@@ -16,13 +16,22 @@ fn main() {
         env!("CARGO_PKG_DESCRIPTION"),
     )
     .get_matches();
-    let listener: TcpListener =
-        TcpListener::bind(matches.value_of("port").unwrap()).unwrap();
-    println!("listening at {}", matches.value_of("port").unwrap());
+    let listener: TcpListener = TcpListener::bind(
+        matches
+            .value_of("port")
+            .expect("Could not get value of port parameter"),
+    )
+    .expect("Could not bind to the given address"); // TODO: handle bind error manually
+    println!(
+        "listening at {}",
+        matches
+            .value_of("port")
+            .expect("Could not get value of port parameter")
+    );
     let pool = ThreadPool::new(
         matches
             .value_of("max")
-            .unwrap()
+            .expect("Could not get value of max threads parameter")
             .parse::<usize>()
             .unwrap_or(statics::MAX_THREADS),
     );
@@ -31,7 +40,9 @@ fn main() {
     let path: &'static str = "./test_data/file.txt";
 
     for stream in listener.incoming() {
-        let stream = stream.unwrap();
+        let stream = stream.expect(
+            "The stream unwrapped with an Err value for `stream.incoming()`",
+        );
         pool.execute(move || {
             handle(stream, Path::new(path));
         })
@@ -40,7 +51,9 @@ fn main() {
 
 fn handle(mut stream: TcpStream, path: &Path) {
     let mut buffer: [u8; 512] = [0; 512];
-    stream.read(&mut buffer).unwrap();
+    stream
+        .read(&mut buffer)
+        .expect("Could not read from stream into buffer");
 
     // TODO: get path of file from request (probably use some abstraction of a
     // request)
@@ -59,6 +72,8 @@ fn handle(mut stream: TcpStream, path: &Path) {
         ),
     };
 
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+    stream
+        .write(response.as_bytes())
+        .expect("Could not write to stream");
+    stream.flush().expect("Error flushing stream");
 }
