@@ -16,7 +16,8 @@ fn main() {
         env!("CARGO_PKG_DESCRIPTION"),
     )
     .get_matches();
-    let listener: TcpListener = TcpListener::bind(matches.value_of("port").unwrap()).unwrap();
+    let listener: TcpListener =
+        TcpListener::bind(matches.value_of("port").unwrap()).unwrap();
     println!("listening at {}", matches.value_of("port").unwrap());
     let pool = ThreadPool::new(
         matches
@@ -41,7 +42,8 @@ fn handle(mut stream: TcpStream, path: &Path) {
     let mut buffer: [u8; 512] = [0; 512];
     stream.read(&mut buffer).unwrap();
 
-    // TODO: get path of file from request (probably use some abstraction of a request)
+    // TODO: get path of file from request (probably use some abstraction of a
+    // request)
 
     // Useful for debugging; prints request
     // unsafe {
