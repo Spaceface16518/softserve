@@ -22,6 +22,10 @@ impl ThreadPool {
         ThreadPool { workers, sender }
     }
 
+    pub fn size(&self) -> usize {
+        self.workers.len()
+    }
+
     pub fn execute<F>(&self, f: F)
     where
         F: Send + FnOnce() + 'static,
