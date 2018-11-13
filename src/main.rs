@@ -1,12 +1,21 @@
-use std::fs::read_to_string;
-use std::io::prelude::*;
-use std::net::{TcpListener, TcpStream};
-use std::path::{Path, PathBuf};
+extern crate libc;
+
+use libc::c_char;
+use std::{
+    ffi::CStr,
+    fs::read_to_string,
+    io::{Read, Write},
+    net::{TcpListener, TcpStream},
+};
 
 mod app;
 mod statics;
 mod thread;
 use thread::ThreadPool;
+
+extern "C" {
+    fn parse(s: *const c_char) -> *const c_char;
+}
 
 fn main() {
     let matches = app::app(
@@ -37,26 +46,27 @@ fn main() {
     );
     println!("Thread pool initialized with {} threads", pool.size());
 
-    let path: &'static str = "./test_data/file.txt";
-
     for stream in listener.incoming() {
         let stream = stream.expect(
             "The stream unwrapped with an Err value for `stream.incoming()`",
         );
-        pool.execute(move || {
-            handle(stream, Path::new(path));
+        pool.execute(|| {
+            handle(stream);
         })
     }
 }
 
-fn handle(mut stream: TcpStream, path: &Path) {
+fn handle(mut stream: TcpStream) {
     let mut buffer: [u8; 512] = [0; 512];
     stream
         .read(&mut buffer)
         .expect("Could not read from stream into buffer");
 
-    // TODO: get path of file from request (probably use some abstraction of a
-    // request)
+    let path: &str = unsafe {
+        CStr::from_ptr(parse(buffer.as_ptr() as *const c_char))
+            .to_str()
+            .unwrap()
+    };
 
     // Useful for debugging; prints request
     // unsafe {
@@ -65,6 +75,7 @@ fn handle(mut stream: TcpStream, path: &Path) {
 
     let response = match read_to_string(path) {
         Ok(p) => format!("{}{}", statics::STATUS_LINE_200, p),
+        // TODO: more specific error handling
         _ => format!(
             "{}{}",
             statics::STATUS_LINE_404,

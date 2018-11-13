@@ -1,7 +1,12 @@
 [package]
 name = "softserve"
-version = "0.2.11"
+version = "0.2.23"
 authors = ["Spaceface16518 <33424649+Spaceface16518@users.noreply.github.com>"]
+build = "build/build.rs"
 
 [dependencies]
 clap = "2.32"
+libc = "0.2"
+
+[build-dependencies]
+cc = "1.0"

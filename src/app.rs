@@ -1,8 +1,6 @@
 extern crate clap;
 
-use self::clap::{App, Arg, ArgMatches};
-use std::net::SocketAddrV4;
-use std::path::Path;
+use self::clap::{App, Arg};
 
 #[inline]
 pub fn app<'a, 'b>(
